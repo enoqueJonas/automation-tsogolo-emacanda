@@ -1,10 +1,7 @@
 package tests;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import pages.LoginPage;
 import utils.DriverFactory;
 
@@ -14,15 +11,14 @@ public class LoginTest {
 
     private LoginPage loginPage;
 
-    // Doing the necessary setup before running teh tests
-    @BeforeTest
+    @BeforeTest(alwaysRun = true)
     @Parameters("browserType")
-    public void setUp(String browser) throws MalformedURLException {
+    public void setUp(@Optional("chrome") String browser) throws MalformedURLException {
+        // Use the parameter from testng.xml or default to "chrome"
         DriverFactory.initDriver(browser);
         loginPage = new LoginPage(DriverFactory.getDriver());
     }
 
-    // Test the login with validncredentials
     @Test
     public void validLoginTest() {
         loginPage.open();
@@ -31,43 +27,37 @@ public class LoginTest {
         Assert.assertEquals(loginPage.getSuccessMessage(), expected);
     }
 
-    // Test the login with invalid username
     @Test
     public void invalidUsernameTest() throws InterruptedException {
         loginPage.open();
         loginPage.login("st", "Password123");
         String text = "";
 
-        // This loop is to make sure we have the error message before doing the assertion
-        for (int i = 0; i < 5; i++) {  // 5 attempts
+        for (int i = 0; i < 5; i++) {
             text = loginPage.getErrorMessage().trim();
             if (!text.isEmpty()) break;
-            Thread.sleep(500);  // wait 0.5s between attempts
+            Thread.sleep(500);
         }
         String expected = "Your username is invalid!";
-        Assert.assertEquals(loginPage.getErrorMessage(), expected);
+        Assert.assertEquals(text, expected);  // ✅ use text instead of re-fetching
     }
 
-
-    // Test the login with invalid password
     @Test
     public void invalidPasswordTest() throws InterruptedException {
         loginPage.open();
         loginPage.login("student", "Wrong");
         String text = "";
 
-        // This loop is to make sure we have the error message before doing the assertion
-        for (int i = 0; i < 5; i++) {  // 5 attempts
+        for (int i = 0; i < 5; i++) {
             text = loginPage.getErrorMessage().trim();
             if (!text.isEmpty()) break;
-            Thread.sleep(500);  // wait 0.5s between attempts
+            Thread.sleep(500);
         }
         String expected = "Your password is invalid!";
-        Assert.assertEquals(loginPage.getErrorMessage(), expected);
+        Assert.assertEquals(text, expected);  // ✅ use text instead of re-fetching
     }
 
-    // Doing the cleanup after tests
-    @AfterTest
+    @AfterTest(alwaysRun = true)
     public void tearDown() {
         DriverFactory.quitDriver();
     }

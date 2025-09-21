@@ -12,7 +12,7 @@ public class DriverFactory {
     private static ThreadLocal<RemoteWebDriver> driver = new ThreadLocal<>();
 
     // Using a remote URL - the tests will run on a docker container (selenium/standalone-chrome)
-    private static final String REMOTE_URL = "http://localhost:4444/wd/hub";
+    private static final String REMOTE_URL = "http://localhost:4444";
 
     public static void initDriver(String browser) throws MalformedURLException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
